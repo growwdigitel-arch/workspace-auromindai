@@ -15,7 +15,7 @@ $app = new Illuminate\Foundation\Application(
     $_ENV['APP_BASE_PATH'] ?? dirname(__DIR__)
 );
 
-if (getenv('VERCEL') || isset($_ENV['VERCEL']) || !is_writable(dirname(__DIR__) . '/storage')) {
+if (!is_writable(dirname(__DIR__) . '/storage')) {
     if (!is_dir('/tmp/storage')) {
         @mkdir('/tmp/storage/framework/views', 0777, true);
         @mkdir('/tmp/storage/framework/cache/data', 0777, true);
