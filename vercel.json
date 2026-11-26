@@ -1,22 +1,4 @@
 {
-  "version": 2,
-  "framework": null,
-  "installCommand": "echo 'Skipping install'",
-  "buildCommand": "echo 'Skipping build'",
-  "outputDirectory": "public",
-  "functions": {
-    "api/index.php": {
-      "runtime": "vercel-php@0.9.0"
-    }
-  },
-  "routes": [
-    {
-      "src": "/(css|js|images|fonts|storage|assets|vendor|svg|favicon.ico|user-uploads)/(.*)",
-      "dest": "/public/$1/$2"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/api/index.php"
-    }
-  ]
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "container"
 }

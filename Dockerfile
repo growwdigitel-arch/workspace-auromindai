@@ -33,13 +33,14 @@ RUN mkdir -p storage/framework/sessions \
     storage/framework/cache/data \
     storage/logs \
     bootstrap/cache \
-    && chown -R www-data:www-data storage bootstrap/cache public/user-uploads \
-    && chmod -R 775 storage bootstrap/cache
+    public/user-uploads \
+    && chmod -R 777 storage bootstrap/cache public/user-uploads
 
-# Configure FrankenPHP Caddy server for Laravel public/ directory
-ENV SERVER_NAME=":8080"
+# Copy Caddyfile for FrankenPHP
+COPY Caddyfile /etc/caddy/Caddyfile
+
 ENV CADDY_GLOBAL_OPTIONS="auto_https off"
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "frankenphp php-server --root /app/public --listen :${PORT:-8080}"]
+CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]
