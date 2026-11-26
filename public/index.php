@@ -3,6 +3,30 @@
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;
 
+if (isset($_GET['__ping'])) {
+    header('Content-Type: text/plain; charset=utf-8');
+    echo "PHP OK: " . PHP_VERSION . "\n";
+    echo "DB_HOST=" . (getenv('DB_HOST') ?: 'unset') . "\n";
+    echo "DB_PORT=" . (getenv('DB_PORT') ?: 'unset') . "\n";
+    echo "DB_DATABASE=" . (getenv('DB_DATABASE') ?: 'unset') . "\n";
+    echo "SESSION_DRIVER=" . (getenv('SESSION_DRIVER') ?: 'unset') . "\n";
+    $host = getenv('DB_HOST');
+    $port = getenv('DB_PORT') ?: '3306';
+    $db = getenv('DB_DATABASE');
+    $user = getenv('DB_USERNAME');
+    $pass = getenv('DB_PASSWORD');
+    if ($host && $db && $user) {
+        try {
+            $t = microtime(true);
+            $pdo = new PDO("mysql:host={$host};port={$port};dbname={$db}", $user, $pass, [PDO::ATTR_TIMEOUT => 4]);
+            echo "MySQL OK (" . round(microtime(true) - $t, 2) . "s)\n";
+        } catch (\Throwable $e) {
+            echo "MySQL ERR: " . $e->getMessage() . "\n";
+        }
+    }
+    exit(0);
+}
+
 if (!file_exists(__DIR__ . '/../.env') && !getenv('APP_KEY') && !isset($_ENV['APP_KEY']) && !getenv('VERCEL')) {
     $GLOBALS["error_type"] = "env-missing";
     include('error_install.php');
