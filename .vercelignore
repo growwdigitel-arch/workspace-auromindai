@@ -1,5 +1,8 @@
 /vendor
 /node_modules
+/Modules/AssetManagement/node_modules
+/Modules/AssetManagement/package.json
+/Modules/AssetManagement/package-lock.json
 .env
 .env.dev
 .env.backup
