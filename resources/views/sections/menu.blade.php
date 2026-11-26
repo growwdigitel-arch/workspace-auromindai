@@ -402,7 +402,9 @@
 
 <!-- NAV ITEM - REPORTS COLLAPASE MENU -->
     <!-- NAV ITEM - ASSETS -->
-    <x-menu-item icon="layers" :text="__('Assets')" :link="route('assetmanagement.index')" />
+    @if (Route::has('assetmanagement.index'))
+        <x-menu-item icon="layers" :text="__('Assets')" :link="route('assetmanagement.index')" />
+    @endif
 
 <!-- NAV ITEM - SETTINGS -->
     <x-menu-item icon="gear" :text="__('app.menu.settings')"
