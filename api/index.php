@@ -1,5 +1,46 @@
 <?php
 
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+
+register_shutdown_function(function () {
+    $error = error_get_last();
+    if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR], true)) {
+        if (!headers_sent()) {
+            http_response_code(500);
+            header('Content-Type: text/plain; charset=utf-8');
+        }
+        echo "PHP Fatal Error: {$error['message']}\nFile: {$error['file']}:{$error['line']}\n";
+    }
+});
+
+if (isset($_GET['__diag'])) {
+    header('Content-Type: text/plain; charset=utf-8');
+    echo "PHP Version: " . PHP_VERSION . "\n";
+    echo "VERCEL env: " . (getenv('VERCEL') ?: 'unset') . "\n";
+    echo "APP_KEY set: " . (getenv('APP_KEY') ? 'yes' : 'no') . "\n";
+    echo "DB_HOST: " . (getenv('DB_HOST') ?: 'unset') . "\n";
+    echo "DB_PORT: " . (getenv('DB_PORT') ?: 'unset') . "\n";
+    echo "DB_DATABASE: " . (getenv('DB_DATABASE') ?: 'unset') . "\n";
+    echo "vendor/autoload exists: " . (file_exists(__DIR__ . '/../vendor/autoload.php') ? 'yes' : 'no') . "\n";
+    $host = getenv('DB_HOST');
+    $port = getenv('DB_PORT') ?: '3306';
+    $db = getenv('DB_DATABASE');
+    $user = getenv('DB_USERNAME');
+    $pass = getenv('DB_PASSWORD');
+    if ($host && $db && $user) {
+        try {
+            $dsn = "mysql:host={$host};port={$port};dbname={$db}";
+            $pdo = new PDO($dsn, $user, $pass, [PDO::ATTR_TIMEOUT => 3]);
+            echo "MySQL connection: OK\n";
+        } catch (\Throwable $e) {
+            echo "MySQL connection FAILED: " . $e->getMessage() . "\n";
+        }
+    }
+    exit(0);
+}
+
 // Ensure writable /tmp directories exist on Vercel serverless read-only filesystem
 if (getenv('VERCEL') || isset($_ENV['VERCEL']) || !is_writable(__DIR__ . '/../storage')) {
     $tmpDirs = [
