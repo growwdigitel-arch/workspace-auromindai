@@ -931,3 +931,18 @@ Route::get('/debug-log', function () {
            '</pre>';
 });
 
+Route::get('/setup-sessions', function () {
+    if (!\Illuminate\Support\Facades\Schema::hasTable('sessions')) {
+        \Illuminate\Support\Facades\Schema::create('sessions', function (\Illuminate\Database\Schema\Blueprint $table) {
+            $table->string('id')->primary();
+            $table->foreignId('user_id')->nullable()->index();
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->longText('payload');
+            $table->integer('last_activity')->index();
+        });
+        return 'Sessions table created successfully! You can now set SESSION_DRIVER=database in Vercel Environment Variables.';
+    }
+    return 'Sessions table already exists. Make sure SESSION_DRIVER=database is set in Vercel Environment Variables.';
+});
+
