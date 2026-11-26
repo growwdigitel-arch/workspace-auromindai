@@ -37,11 +37,8 @@ RUN mkdir -p storage/framework/sessions \
     public/user-uploads \
     && chmod -R 777 storage bootstrap/cache public/user-uploads
 
-# Copy Caddyfile for FrankenPHP
-COPY Caddyfile /etc/caddy/Caddyfile
-
 ENV CADDY_GLOBAL_OPTIONS="auto_https off"
 
 EXPOSE 8080
 
-CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]
+CMD ["sh", "-c", "frankenphp php-server --root /app/public --listen :${PORT:-8080}"]

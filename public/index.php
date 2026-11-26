@@ -10,18 +10,20 @@ if (isset($_GET['__ping'])) {
     echo "DB_PORT=" . (getenv('DB_PORT') ?: 'unset') . "\n";
     echo "DB_DATABASE=" . (getenv('DB_DATABASE') ?: 'unset') . "\n";
     echo "SESSION_DRIVER=" . (getenv('SESSION_DRIVER') ?: 'unset') . "\n";
-    $host = getenv('DB_HOST');
-    $port = getenv('DB_PORT') ?: '3306';
-    $db = getenv('DB_DATABASE');
-    $user = getenv('DB_USERNAME');
-    $pass = getenv('DB_PASSWORD');
-    if ($host && $db && $user) {
-        try {
-            $t = microtime(true);
-            $pdo = new PDO("mysql:host={$host};port={$port};dbname={$db}", $user, $pass, [PDO::ATTR_TIMEOUT => 4]);
-            echo "MySQL OK (" . round(microtime(true) - $t, 2) . "s)\n";
-        } catch (\Throwable $e) {
-            echo "MySQL ERR: " . $e->getMessage() . "\n";
+    if ($_GET['__ping'] === 'db') {
+        $host = getenv('DB_HOST');
+        $port = getenv('DB_PORT') ?: '3306';
+        $db = getenv('DB_DATABASE');
+        $user = getenv('DB_USERNAME');
+        $pass = getenv('DB_PASSWORD');
+        if ($host && $db && $user) {
+            try {
+                $t = microtime(true);
+                $pdo = new PDO("mysql:host={$host};port={$port};dbname={$db}", $user, $pass, [PDO::ATTR_TIMEOUT => 4]);
+                echo "MySQL OK (" . round(microtime(true) - $t, 2) . "s)\n";
+            } catch (\Throwable $e) {
+                echo "MySQL ERR: " . $e->getMessage() . "\n";
+            }
         }
     }
     exit(0);
