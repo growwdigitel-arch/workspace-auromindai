@@ -1,14 +1,15 @@
 {
   "version": 2,
-  "framework": null,
-  "installCommand": "echo 'Skipping install'",
-  "buildCommand": "echo 'Skipping build'",
-  "outputDirectory": "public",
-  "functions": {
-    "api/index.php": {
-      "runtime": "vercel-php@0.7.0"
+  "builds": [
+    {
+      "src": "api/index.php",
+      "use": "vercel-php@0.7.0"
+    },
+    {
+      "src": "public/**",
+      "use": "@vercel/static"
     }
-  },
+  ],
   "routes": [
     {
       "src": "/(css|js|images|fonts|storage|assets|vendor|svg|favicon.ico|user-uploads)/(.*)",
