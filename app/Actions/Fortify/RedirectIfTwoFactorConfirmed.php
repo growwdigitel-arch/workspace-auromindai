@@ -21,8 +21,12 @@ class RedirectIfTwoFactorConfirmed extends RedirectIfTwoFactorAuthenticatable
         if (optional($user)->two_factor_email_confirmed && ($user->two_fa_verify_via == 'email' || $user->two_fa_verify_via == 'both') &&
             in_array(TwoFactorAuthenticatable::class, class_uses_recursive($user))) {
             // Send otp to user from here
-            $user->generateTwoFactorCode();
-            event(new TwoFactorCodeEvent($user));
+            try {
+                $user->generateTwoFactorCode();
+                event(new TwoFactorCodeEvent($user));
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('TwoFactorCodeEvent error: ' . $e->getMessage());
+            }
 
             return $this->twoFactorChallengeResponse($request, $user);
         }

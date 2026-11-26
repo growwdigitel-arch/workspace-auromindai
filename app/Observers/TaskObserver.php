@@ -116,7 +116,7 @@ class TaskObserver
                 }
                 else {
 
-                    if ($task->project->client_id != null && $task->project->allow_client_notification == 'enable' && $task->project->client->status != 'deactive') {
+                    if ($task->project && $task->project->client_id != null && $task->project->allow_client_notification == 'enable' && $task->project->client && $task->project->client->status != 'deactive') {
                         event(new TaskEvent($task, $task->project->client, 'NewClientTask'));
                     }
 

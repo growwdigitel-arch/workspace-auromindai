@@ -1,3 +1,4 @@
+@if ($user)
 <div class="card ticket-message rounded-0 border-0  @if (user()->id == $user->id) bg-white-shade @endif"
     id="message-{{ $message->id }}">
     <div class="card-horizontal">
@@ -80,3 +81,4 @@
 
     </div>
 </div><!-- card end -->
+@endif

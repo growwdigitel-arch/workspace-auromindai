@@ -902,3 +902,32 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::resource('gantt_link', GanttLinkController::class);
 
 });
+
+Route::get('/clear-cache', function () {
+    if (function_exists('opcache_reset')) {
+        @opcache_reset();
+    }
+    \Illuminate\Support\Facades\Artisan::call('view:clear');
+    \Illuminate\Support\Facades\Artisan::call('cache:clear');
+    \Illuminate\Support\Facades\Artisan::call('config:clear');
+    \Illuminate\Support\Facades\Artisan::call('route:clear');
+    return '<div style="font-family:sans-serif; text-align:center; padding-top:50px;"><h2>All Caches Cleared Successfully!</h2><p>PHP OPcache, view:clear, cache:clear, config:clear, and route:clear have been executed.</p></div>';
+});
+
+Route::get('/debug-log', function () {
+    $files = glob(storage_path('logs/*.log'));
+    if (empty($files)) {
+        return 'No log files found in storage/logs/';
+    }
+    usort($files, function($a, $b) {
+        return filemtime($b) - filemtime($a);
+    });
+    $latest = $files[0];
+    $lines = file($latest);
+    $lastLines = array_slice($lines, -100);
+    return '<pre style="background:#222;color:#0f0;padding:20px;font-size:13px;white-space:pre-wrap;">' .
+           'Log file: ' . basename($latest) . "\n\n" .
+           htmlspecialchars(implode("", $lastLines)) .
+           '</pre>';
+});
+

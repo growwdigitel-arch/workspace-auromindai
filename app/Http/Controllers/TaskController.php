@@ -452,15 +452,15 @@ class TaskController extends AccountBaseController
 
         $task->is_private = $request->has('is_private') ? 1 : 0;
         $task->billable = $request->has('billable') && $request->billable ? 1 : 0;
-        $task->estimate_hours = $request->estimate_hours;
-        $task->estimate_minutes = $request->estimate_minutes;
+        $task->estimate_hours = $request->estimate_hours ?? 0;
+        $task->estimate_minutes = $request->estimate_minutes ?? 0;
 
         if ($request->board_column_id) {
             $task->board_column_id = $request->board_column_id;
         }
 
         $waitingApprovalTaskBoardColumn = TaskboardColumn::waitingForApprovalColumn();
-        if($request->board_column_id == $waitingApprovalTaskBoardColumn->id){
+        if($waitingApprovalTaskBoardColumn && $request->board_column_id == $waitingApprovalTaskBoardColumn->id){
             $task->approval_send = 1;
         }else{
             $task->approval_send = 0;
@@ -800,8 +800,8 @@ class TaskController extends AccountBaseController
         $task->dependent_task_id = $request->has('dependent') && $request->has('dependent_task_id') && $request->dependent_task_id != '' ? $request->dependent_task_id : null;
         $task->is_private = $request->has('is_private') ? 1 : 0;
         $task->billable = $request->has('billable') && $request->billable ? 1 : 0;
-        $task->estimate_hours = $request->estimate_hours;
-        $task->estimate_minutes = $request->estimate_minutes;
+        $task->estimate_hours = $request->estimate_hours ?? 0;
+        $task->estimate_minutes = $request->estimate_minutes ?? 0;
 
         if ($request->project_id != '') {
             $task->project_id = $request->project_id;

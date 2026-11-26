@@ -309,6 +309,9 @@
                             showContent();
                         }
                     }
+                },
+                error: function (jqXHR) {
+                    showContent();
                 }
             });
 

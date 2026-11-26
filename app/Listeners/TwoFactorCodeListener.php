@@ -4,6 +4,7 @@ namespace App\Listeners;
 
 use App\Events\TwoFactorCodeEvent;
 use App\Notifications\TwoFactorCode;
+use Illuminate\Support\Facades\Log;
 
 class TwoFactorCodeListener
 {
@@ -16,7 +17,11 @@ class TwoFactorCodeListener
      */
     public function handle(TwoFactorCodeEvent $event)
     {
-        $event->user->notify(new TwoFactorCode());
+        try {
+            $event->user->notify(new TwoFactorCode());
+        } catch (\Throwable $e) {
+            Log::error('TwoFactorCodeListener email notification error: ' . $e->getMessage());
+        }
     }
 
 }

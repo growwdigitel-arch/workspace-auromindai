@@ -21,6 +21,7 @@ $unreadMessageCount = $user->unread_messages_count ?? 0;
     }
 </style>
 
+@if ($user)
 <div class="card rounded-0 border-top-0 border-left-0 border-right-0 user_list_box position-relative" id="user-no-{{ $user->id }}">
     <a @class([
         'tablinks',
@@ -78,4 +79,5 @@ $unreadMessageCount = $user->unread_messages_count ?? 0;
         </div>
     @endif
 </div><!-- card end -->
+@endif
 

@@ -55,8 +55,12 @@ class RedirectIfTwoFactorAuthenticatable
         if (($user->two_fa_verify_via != '') && in_array(TwoFactorAuthenticatable::class, class_uses_recursive($user))) {
             if ($user->two_fa_verify_via == 'email') {
                 // Send otp to user from here
-                $user->generateTwoFactorCode();
-                event(new TwoFactorCodeEvent($user));
+                try {
+                    $user->generateTwoFactorCode();
+                    event(new TwoFactorCodeEvent($user));
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::error('TwoFactorCodeEvent error: ' . $e->getMessage());
+                }
             }
 
             return $this->twoFactorChallengeResponse($request, $user);

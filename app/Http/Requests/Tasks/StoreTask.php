@@ -59,10 +59,10 @@ class StoreTask extends CoreRequest
 
         $waitingApproval = TaskboardColumn::waitingForApprovalColumn();
         if($project == null){
-            $rules['board_column_id'] = 'not_in:' . $waitingApproval->id;
+            $rules['board_column_id'] = 'not_in:' . (optional($waitingApproval)->id ?? 0);
         }else{
             if($project->need_approval_by_admin == 0) {
-                $rules['board_column_id'] = 'not_in:' . $waitingApproval->id;
+                $rules['board_column_id'] = 'not_in:' . (optional($waitingApproval)->id ?? 0);
             }
         }
 

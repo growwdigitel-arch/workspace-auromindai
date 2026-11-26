@@ -39,22 +39,26 @@ class NewChat extends BaseNotification
     {
         $via = ['database'];
 
-        if ($this->emailSetting->send_email == 'yes' && $notifiable->email_notifications && $notifiable->email != '') {
+        if ($this->emailSetting && $this->emailSetting->send_email == 'yes' && $notifiable->email_notifications && $notifiable->email != '') {
             array_push($via, 'mail');
         }
 
-        if ($this->emailSetting->send_slack == 'yes' && slack_setting()->status == 'active') {
+        if ($this->emailSetting && $this->emailSetting->send_slack == 'yes' && slack_setting()->status == 'active') {
             array_push($via, 'slack');
         }
 
-        if ($this->emailSetting->send_push == 'yes' && push_setting()->status == 'active') {
+        if ($this->emailSetting && $this->emailSetting->send_push == 'yes' && push_setting()->status == 'active') {
             array_push($via, OneSignalChannel::class);
         }
 
-        if ($this->emailSetting->send_push == 'yes' && push_setting()->beams_push_status == 'active') {
-            $pushNotification = new \App\Http\Controllers\DashboardController();
-            $pushUsersIds = [[$notifiable->id]];
-            $pushNotification->sendPushNotifications($pushUsersIds, __('email.newChat.subject'), strip_tags($this->userChat->message));
+        if ($this->emailSetting && $this->emailSetting->send_push == 'yes' && push_setting()->beams_push_status == 'active') {
+            try {
+                $pushNotification = new \App\Http\Controllers\DashboardController();
+                $pushUsersIds = [[$notifiable->id]];
+                $pushNotification->sendPushNotifications($pushUsersIds, __('email.newChat.subject'), strip_tags($this->userChat->message));
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('NewChat beams push error: ' . $e->getMessage());
+            }
         }
 
         return $via;

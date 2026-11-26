@@ -4,6 +4,7 @@ namespace App\Listeners;
 
 use App\Events\NewMentionChatEvent;
 use App\Notifications\NewMentionChat;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 
 class NewMentionChatListener
@@ -18,7 +19,13 @@ class NewMentionChatListener
 
     public function handle(NewMentionChatEvent $event)
     {
-        Notification::send($event->notifyUser, new NewMentionChat($event->userChat));
+        try {
+            if ($event->notifyUser) {
+                Notification::send($event->notifyUser, new NewMentionChat($event->userChat));
+            }
+        } catch (\Throwable $e) {
+            Log::error('NewMentionChatListener notification error: ' . $e->getMessage());
+        }
     }
 
 }

@@ -209,19 +209,17 @@ class MessageController extends AccountBaseController
             $receiverID = $request->user_id;
         }
 
-        $message = $request->message;
+        $messageText = $request->message;
 
-        if($request->types == 'chat')
-        {
-            $validateModule = $this->validateModule($message);
+        if ($request->types == 'chat') {
+            $validateModule = $this->validateModule($messageText);
 
-            if($validateModule['status'] == false)
-            {
-                return Reply::error($validateModule ['message'] );
+            if ($validateModule['status'] == false) {
+                return Reply::error($validateModule['message']);
             }
-
         }
 
+        try {
             $message = new UserChat();
             $message->message         = $request->message;
             $message->user_one        = user()->id;
@@ -230,16 +228,42 @@ class MessageController extends AccountBaseController
             $message->to              = $receiverID;
             $message->notification_sent = 0;
             $message->save();
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('UserChat save error: ' . $e->getMessage());
+        }
 
+        try {
             $userLists = UserChat::userListLatest(user()->id, null);
             $messageIds = collect($userLists)->pluck('id');
-            $this->userLists = UserChat::with('fromUser', 'toUser')->whereIn('id', $messageIds)->orderByDesc('id')->get();
+            $this->userLists = UserChat::with(['fromUser' => function ($q) {
+                $q->withCount(['unreadMessages']);
+            }, 'toUser' => function ($q) {
+                $q->withCount(['unreadMessages']);
+            }])->whereIn('id', $messageIds)->orderByDesc('id')->get();
             $userList = view('messages.user_list', $this->data)->render();
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('UserChat userList render error: ' . $e->getMessage());
+            $userList = '';
+        }
 
+        try {
             $this->chatDetails = UserChat::chatDetail($receiverID, user()->id);
             $messageList = view('messages.message_list', $this->data)->render();
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('UserChat messageList render error: ' . $e->getMessage());
+            $messageList = '';
+        }
 
-            return Reply::dataOnly(['user_list' => $userList, 'message_list' => $messageList, 'message_id' => $message->id, 'receiver_id' => $receiverID, 'userName' => $message->toUser->name]);
+        $userName = (isset($message) && $message->toUser) ? $message->toUser->name : '';
+        $messageId = isset($message) ? $message->id : null;
+
+        return Reply::dataOnly([
+            'user_list' => $userList,
+            'message_list' => $messageList,
+            'message_id' => $messageId,
+            'receiver_id' => $receiverID,
+            'userName' => $userName
+        ]);
 
     }
 
@@ -308,10 +332,15 @@ class MessageController extends AccountBaseController
 
     public function fetchUserMessages($receiverID)
     {
-        $this->chatDetails = UserChat::chatDetail($receiverID, user()->id);
-        $messageList = view('messages.message_list', $this->data)->render();
+        try {
+            $this->chatDetails = UserChat::chatDetail($receiverID, user()->id);
+            $messageList = view('messages.message_list', $this->data)->render();
 
-        return Reply::dataOnly(['message_list' => $messageList]);
+            return Reply::dataOnly(['message_list' => $messageList]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('fetchUserMessages error: ' . $e->getMessage());
+            return Reply::dataOnly(['message_list' => '']);
+        }
     }
 
     public function checkNewMessages()
