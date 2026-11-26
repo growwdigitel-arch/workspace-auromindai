@@ -941,8 +941,11 @@ Route::get('/setup-sessions', function () {
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
-        return 'Sessions table created successfully! You can now set SESSION_DRIVER=database in Vercel Environment Variables.';
+        return 'Sessions table created successfully!';
     }
-    return 'Sessions table already exists. Make sure SESSION_DRIVER=database is set in Vercel Environment Variables.';
+    \Illuminate\Support\Facades\DB::statement('ALTER TABLE `sessions` MODIFY `payload` LONGTEXT NOT NULL');
+    $count = \Illuminate\Support\Facades\DB::table('sessions')->count();
+    $cols = \Illuminate\Support\Facades\DB::select('SHOW COLUMNS FROM `sessions`');
+    return response()->json(['status' => 'ok', 'rows' => $count, 'columns' => $cols]);
 });
 
