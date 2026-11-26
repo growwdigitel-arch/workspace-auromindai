@@ -109,7 +109,7 @@ class CustomConfigProvider extends ServiceProvider
     // SessionDriverConfigProvider moved here so it only fetches in single query
     public function setSessionDriver($setting)
     {
-        Config::set('session.driver', $setting->session_driver != '' ? $setting->session_driver : 'file');
+        Config::set('session.driver', env('SESSION_DRIVER') ?: ($setting->session_driver != '' ? $setting->session_driver : 'file'));
         Config::set('app.cron_timezone', $setting->timezone);
     }
 

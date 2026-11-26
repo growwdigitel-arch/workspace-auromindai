@@ -24,7 +24,7 @@ class SessionDriverConfigProvider extends ServiceProvider
             $setting = DB::table('global_settings')->first();
 
             if ($setting) {
-                Config::set('session.driver', $setting->session_driver != '' ? $setting->session_driver : 'file');
+                Config::set('session.driver', env('SESSION_DRIVER') ?: ($setting->session_driver != '' ? $setting->session_driver : 'file'));
                 Config::set('app.cron_timezone', $setting->timezone);
             }
 

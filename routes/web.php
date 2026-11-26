@@ -946,6 +946,6 @@ Route::get('/setup-sessions', function () {
     \Illuminate\Support\Facades\DB::statement('ALTER TABLE `sessions` MODIFY `payload` LONGTEXT NOT NULL');
     $count = \Illuminate\Support\Facades\DB::table('sessions')->count();
     $cols = \Illuminate\Support\Facades\DB::select('SHOW COLUMNS FROM `sessions`');
-    return response()->json(['status' => 'ok', 'rows' => $count, 'columns' => $cols]);
+    return response()->json(['status' => 'ok', 'active_driver' => config('session.driver'), 'rows' => $count, 'columns' => $cols]);
 });
 
